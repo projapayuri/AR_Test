@@ -1,61 +1,146 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>AR HP Demo</title>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
+  <title>AR HP Demo</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+
+  <!-- AR.js -->
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #hp-label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 9999;
+
+      padding: 10px 20px;
+      border-radius: 8px;
+
+      color: white;
+      background-color: rgba(0, 0, 0, 0.65);
+
+      font-size: 28px;
+      font-family: sans-serif;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
-<body style="margin:0; overflow:hidden;">
+<body>
 
-<a-scene embedded arjs="sourceType:webcam;">
+  <!-- 画面に固定するHP表示 -->
+  <div id="hp-label">
+    HP：30
+  </div>
 
+  <a-scene
+    embedded
+    arjs="sourceType: webcam; debugUIEnabled: false;"
+  >
+
+    <!-- Hiroマーカー -->
     <a-marker preset="hiro">
 
-        <a-box
-            id="box"
-            position="0 0.5 0"
-            material="wireframe:true; color:cyan;"
-            animation="
-                property: rotation;
-                to:0 360 0;
-                dur:3000;
-                loop:true;
-                easing:linear;
-            ">
-        </a-box>
+      <!-- ワイヤーフレームの立方体 -->
+      <a-box
+        id="box"
+        position="0 0.5 0"
+        width="1"
+        height="1"
+        depth="1"
+        material="
+          color: cyan;
+          wireframe: true;
+        "
+        animation="
+          property: rotation;
+          to: 0 360 0;
+          dur: 3000;
+          loop: true;
+          easing: linear;
+        "
+      >
+      </a-box>
 
     </a-marker>
 
+    <!-- カメラ -->
     <a-entity camera></a-entity>
 
-</a-scene>
+  </a-scene>
 
-<script>
-const state = {
-    hp: 30
-};
+  <script>
+    // 状態
+    const state = {
+      hp: 30
+    };
 
-const box = document.querySelector("#box");
+    // HTML要素を取得
+    const box = document.querySelector("#box");
+    const hpLabel = document.querySelector("#hp-label");
 
-window.addEventListener("click", () => {
+    // 状態を画面に反映する関数
+    function render() {
+      hpLabel.textContent = `HP：${state.hp}`;
 
-    if(state.hp <= 0) return;
+      // HPに応じて色を変える
+      if (state.hp <= 10) {
+        box.setAttribute("material", {
+          color: "red",
+          wireframe: true
+        });
+      } else if (state.hp <= 20) {
+        box.setAttribute("material", {
+          color: "yellow",
+          wireframe: true
+        });
+      } else {
+        box.setAttribute("material", {
+          color: "cyan",
+          wireframe: true
+        });
+      }
 
-    state.hp -= 3;
-
-    console.log("HP:", state.hp);
-
-    if(state.hp <= 0){
-        state.hp = 0;
+      // HPが0になったら立方体を消す
+      if (state.hp <= 0) {
         box.setAttribute("visible", false);
-        console.log("倒した！");
+        hpLabel.textContent = "HP：0　倒した！";
+      }
     }
 
-});
-</script>
+    // 画面をタップしたとき
+    window.addEventListener("click", function () {
+      if (state.hp <= 0) {
+        return;
+      }
+
+      state.hp -= 3;
+
+      // HPがマイナスにならないようにする
+      if (state.hp < 0) {
+        state.hp = 0;
+      }
+
+      render();
+    });
+
+    // 最初の表示
+    render();
+  </script>
 
 </body>
 </html>

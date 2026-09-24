@@ -17,8 +17,8 @@
   <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
 
-  <!-- 物理エンジン -->
-  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.4/dist/aframe-physics-system.min.js"></script>
+<!-- GLBのアニメーション再生用 -->
+<script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.1/dist/aframe-extras.min.js"></script>
 </head>
 
 
@@ -33,26 +33,6 @@
     raycaster="objects: .clickable"
   >
 
-    <!-- 素材 -->
-    <a-assets>
-
-      <img
-        id="brick"
-        src="assets/images/brick.jpg"
-      >
-
-      <img
-        id="metal"
-        src="assets/images/earth.jpg"
-      >
-
-      <img
-        id="grass"
-        src="assets/images/grassland2.jpg"
-      >
-
-    </a-assets>
-
 
 <a-marker preset="hiro">
 
@@ -60,13 +40,7 @@
     src="assets/models/robot.glb"
     position="0 0 0"
     scale="0.5 0.5 0.5"
-    animation="
-      property: rotation;
-      from: 0 0 0;
-      to: 0 360 0;
-      dur: 5000;
-      loop: true;
-      easing: linear;
+animation-mixer="clip: *Robot_Walking
     ">
   </a-gltf-model>
 

@@ -54,29 +54,23 @@
     </a-assets>
 
 
-    <!-- Hiroマーカー -->
-    <a-marker preset="hiro">
+<a-marker preset="hiro">
 
+  <a-gltf-model
+    src="assets/models/robot.glb"
+    position="0 0 0"
+    scale="0.5 0.5 0.5"
+    animation="
+      property: rotation;
+      from: 0 0 0;
+      to: 0 360 0;
+      dur: 5000;
+      loop: true;
+      easing: linear;
+    ">
+  </a-gltf-model>
 
-
-      <a-box
-        src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="0 0.25 0"
-        animation="
-          property:rotation;
-          from:0 0 0;
-          to:0 360 0;
-          loop:true;
-          easing:linear;
-        "
-      </a-box>
-
-
-
-    </a-marker>
+</a-marker>
 
 
     <!-- AR用カメラ -->

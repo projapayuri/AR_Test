@@ -15,37 +15,9 @@
   <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    #hp-label {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 9999;
-
-      padding: 10px 20px;
-      border-radius: 8px;
-
-      color: white;
-      background-color: rgba(0, 0, 0, 0.65);
-
-      font-size: 28px;
-      font-family: sans-serif;
-      font-weight: bold;
-    }
-  </style>
 </head>
 
 <body>
-
-  <!-- 画面に固定するHP表示 -->
-  <div id="hp-label">
-    HP：30
-  </div>
 
   <a-scene
     embedded
@@ -55,26 +27,47 @@
     <!-- Hiroマーカー -->
     <a-marker preset="hiro">
 
-      <!-- ワイヤーフレームの立方体 -->
-      <a-box
-        id="box"
-        position="0 0.5 0"
-        width="1"
-        height="1"
-        depth="1"
-        material="
-          color: cyan;
-          wireframe: true;
-        "
-        animation="
-          property: rotation;
-          to: 0 360 0;
-          dur: 3000;
-          loop: true;
-          easing: linear;
-        "
-      >
-      </a-box>
+<a-asset>
+            <img id="brick" src="../assets/images/brick.jpg" alt="">
+            <img id="metal" src="../assets/images/earth.jpg" alt="">
+            <img id="grass" src="../assets/images/grassland2.jpg" alt="">
+            <img src="" alt="">
+        </a-asset>
+
+        <a-plane rotation="-90 0 0" width="50" height="50" color="darkseagreen" static-body src="#grass"></a-plane>
+        <a-sphere src="#metal" position="0 1 20" color="skyblue" radius="0.7" dynamic-body id="ball"
+            class="clickable"></a-sphere>
+
+        <a-text
+            value="0"
+            position="0 2 10"
+            id="countText"
+            color="white"
+            align="center"
+            scale="6 6 6"
+        ></a-text>
+                <a-plane
+            position="0 2 10"
+            width="2"
+            height="0.7" 
+            color="black"
+            opacity="0.5"
+            scale="3 3 3"   
+        ></a-plane>
+        <a-box src="#brick" width="5" height="5" depth="5" position="0 2.51 -1" dynamic-body class="target">
+        </a-box>
+        <a-box src="#brick" width="5" height="5" depth="5" position="5 2.51 -1" dynamic-body class="target">
+        </a-box>
+        <a-box src="#brick" width="5" height="5" depth="5" position="-5 2.51 -1" dynamic-body class="target">
+        </a-box>
+        <a-box src="#brick" width="5" height="5" depth="5" position="-2.5 7.5 -1" dynamic-body class="target">
+        </a-box>
+        <a-box src="#brick" width="5" height="5" depth="5" position="2.5 7.5 -1" dynamic-body class="target">
+        </a-box>
+        <a-box src="#brick" width="5" height="5" depth="5" position="0 12.5 -1" dynamic-body class="target">
+        </a-box>
+        <a-box src="#brick" width="5" height="5" depth="5" position="0 17.5 -1" dynamic-body class="target">
+        </a-box>
 
     </a-marker>
 
@@ -84,62 +77,45 @@
   </a-scene>
 
   <script>
-    // 状態
-    const state = {
-      hp: 30
-    };
+        const ball = document.getElementById("ball")
 
-    // HTML要素を取得
-    const box = document.querySelector("#box");
-    const hpLabel = document.querySelector("#hp-label");
+        const camera = document.getElementById("camera");
 
-    // 状態を画面に反映する関数
-    function render() {
-      hpLabel.textContent = `HP：${state.hp}`;
+        const countText = document.getElementById("countText");
 
-      // HPに応じて色を変える
-      if (state.hp <= 10) {
-        box.setAttribute("material", {
-          color: "red",
-          wireframe: true
-        });
-      } else if (state.hp <= 20) {
-        box.setAttribute("material", {
-          color: "yellow",
-          wireframe: true
-        });
-      } else {
-        box.setAttribute("material", {
-          color: "cyan",
-          wireframe: true
-        });
-      }
+        let count = 0;
+        function shootBall() {
 
-      // HPが0になったら立方体を消す
-      if (state.hp <= 0) {
-        box.setAttribute("visible", false);
-        hpLabel.textContent = "HP：0　倒した！";
-      }
-    }
+            const direction = new THREE.Vector3();
 
-    // 画面をタップしたとき
-    window.addEventListener("click", function () {
-      if (state.hp <= 0) {
-        return;
-      }
+            // カメラが向いている方向を取得
+            camera.object3D.getWorldDirection(direction);
 
-      state.hp -= 3;
+            const power = -500;
 
-      // HPがマイナスにならないようにする
-      if (state.hp < 0) {
-        state.hp = 0;
-      }
+            ball.body.applyImpulse(
+                new CANNON.Vec3(
+                    direction.x * power,
+                    direction.y * power,
+                    direction.z * power
+                )
+            );
+        }
 
-      render();
-    });
+        ball.addEventListener("click", shootBall);
 
-    // 最初の表示
-    render();
+        function hit(event) {
+            const enemy = event.detail.body.el;  //接触イベントが起きた対象をenemyとする
+
+            if (enemy.classList.contains("target")) {  //enemyのidがtargetだったら
+                enemy.setAttribute("opacity", "0.4");  //enemyの色を赤にする
+                count++;  
+            }
+
+            countText.setAttribute("value", count + " Hit" );
+        }
+
+        ball.addEventListener("collide", hit);
   </script>
 
 </body>

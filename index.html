@@ -1,127 +1,257 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>AR HP Demo</title>
+  <title>AR Physics Demo</title>
 
   <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
   <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
 
+  <!-- 物理エンジン -->
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.4/dist/aframe-physics-system.min.js"></script>
 </head>
 
-<body>
+
+<body style="margin: 0; overflow: hidden;">
 
   <a-scene
     embedded
+    vr-mode-ui="enabled: false"
     arjs="sourceType: webcam; debugUIEnabled: false;"
+    physics="gravity: -9.8"
+    cursor="rayOrigin: mouse"
+    raycaster="objects: .clickable"
   >
 
+    <!-- 素材 -->
+    <a-assets>
+
+      <img
+        id="brick"
+        src="../assets/images/brick.jpg"
+      >
+
+      <img
+        id="metal"
+        src="../assets/images/earth.jpg"
+      >
+
+      <img
+        id="grass"
+        src="../assets/images/grassland2.jpg"
+      >
+
+    </a-assets>
+
+
     <!-- Hiroマーカー -->
-   <a-marker preset="hiro">
+    <a-marker preset="hiro">
 
-  <a-plane
-    rotation="-90 0 0"
-    width="4"
-    height="4"
-    src="#grass"
-    static-body>
-  </a-plane>
 
-  <a-sphere
-    id="ball"
-    class="clickable"
-    src="#metal"
-    position="0 0.25 1.3"
-    radius="0.25"
-    dynamic-body>
-  </a-sphere>
+      <!-- 床 -->
+      <a-plane
+        rotation="-90 0 0"
+        width="4"
+        height="4"
+        src="#grass"
+        static-body>
+      </a-plane>
 
-  <a-box
-    src="#brick"
-    width="0.5"
-    height="0.5"
-    depth="0.5"
-    position="0 0.25 -0.7"
-    dynamic-body
-    class="target">
-  </a-box>
 
-  <a-box
-    src="#brick"
-    width="0.5"
-    height="0.5"
-    depth="0.5"
-    position="0.5 0.25 -0.7"
-    dynamic-body
-    class="target">
-  </a-box>
+      <!-- ボール -->
+      <a-sphere
+        id="ball"
+        class="clickable"
+        src="#metal"
+        position="0 0.25 1.3"
+        radius="0.25"
+        dynamic-body>
+      </a-sphere>
 
-  <a-box
-    src="#brick"
-    width="0.5"
-    height="0.5"
-    depth="0.5"
-    position="-0.5 0.25 -0.7"
-    dynamic-body
-    class="target">
-  </a-box>
 
-</a-marker>
+      <!-- Hit数の背景 -->
+      <a-plane
+        position="0 1.8 -0.9"
+        width="1.4"
+        height="0.45"
+        color="black"
+        opacity="0.6">
+      </a-plane>
 
-    <!-- カメラ -->
-    <a-entity camera></a-entity>
+
+      <!-- Hit数 -->
+      <a-text
+        id="countText"
+        value="0 Hit"
+        position="0 1.79 -0.88"
+        color="white"
+        align="center"
+        width="3">
+      </a-text>
+
+
+      <!-- 的：下段 -->
+      <a-box
+        src="#brick"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        position="-0.55 0.25 -0.7"
+        dynamic-body
+        class="target">
+      </a-box>
+
+      <a-box
+        src="#brick"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        position="0 0.25 -0.7"
+        dynamic-body
+        class="target">
+      </a-box>
+
+      <a-box
+        src="#brick"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        position="0.55 0.25 -0.7"
+        dynamic-body
+        class="target">
+      </a-box>
+
+
+      <!-- 的：中段 -->
+      <a-box
+        src="#brick"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        position="-0.28 0.75 -0.7"
+        dynamic-body
+        class="target">
+      </a-box>
+
+      <a-box
+        src="#brick"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        position="0.28 0.75 -0.7"
+        dynamic-body
+        class="target">
+      </a-box>
+
+
+      <!-- 的：上段 -->
+      <a-box
+        src="#brick"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        position="0 1.25 -0.7"
+        dynamic-body
+        class="target">
+      </a-box>
+
+
+    </a-marker>
+
+
+    <!-- AR用カメラ -->
+    <a-entity
+      id="camera"
+      camera>
+    </a-entity>
+
 
   </a-scene>
 
+
   <script>
-        const ball = document.getElementById("ball")
 
-        const camera = document.getElementById("camera");
+    const ball = document.getElementById("ball");
+    const countText = document.getElementById("countText");
 
-        const countText = document.getElementById("countText");
+    let count = 0;
 
-        let count = 0;
-        function shootBall() {
 
-            const direction = new THREE.Vector3();
+    // =========================
+    // ボールをタップして飛ばす
+    // =========================
 
-            // カメラが向いている方向を取得
-            camera.object3D.getWorldDirection(direction);
+    function shootBall() {
 
-            const power = -500;
+      // bodyがまだ準備されていない場合
+      if (!ball.body) {
+        return;
+      }
 
-            ball.body.applyImpulse(
-                new CANNON.Vec3(
-                    direction.x * power,
-                    direction.y * power,
-                    direction.z * power
-                )
-            );
+      // Hiroマーカー上で奥方向へ飛ばす
+      const force = new CANNON.Vec3(
+        0,     // X
+        0.4,   // Y 少し上へ
+        -2     // Z 奥へ
+      );
+
+      ball.body.applyImpulse(
+        force,
+        ball.body.position
+      );
+    }
+
+
+    ball.addEventListener("click", shootBall);
+
+
+
+    // =========================
+    // 的に当たったとき
+    // =========================
+
+    function hit(event) {
+
+      const enemy = event.detail.body.el;
+
+      // targetクラスがついているか確認
+      if (enemy.classList.contains("target")) {
+
+        // 同じ的を何度も数えない
+        if (enemy.dataset.hit === "true") {
+          return;
         }
 
-        ball.addEventListener("click", shootBall);
+        enemy.dataset.hit = "true";
 
-        function hit(event) {
-            const enemy = event.detail.body.el;  //接触イベントが起きた対象をenemyとする
+        // 当たった的を半透明にする
+        enemy.setAttribute("opacity", "0.4");
 
-            if (enemy.classList.contains("target")) {  //enemyのidがtargetだったら
-                enemy.setAttribute("opacity", "0.4");  //enemyの色を赤にする
-                count++;  
-            }
+        // カウント
+        count++;
 
-            countText.setAttribute("value", count + " Hit" );
-        }
+        countText.setAttribute(
+          "value",
+          count + " Hit"
+        );
+      }
+    }
 
-        ball.addEventListener("collide", hit);
+
+    ball.addEventListener("collide", hit);
+
   </script>
 
 </body>
+
 </html>

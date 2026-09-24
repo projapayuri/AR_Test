@@ -58,112 +58,15 @@
     <a-marker preset="hiro">
 
 
-      <!-- 床 -->
-      <a-plane
-        rotation="-90 0 0"
-        width="4"
-        height="4"
-        src="#grass"
-        static-body>
-      </a-plane>
-
-
-      <!-- ボール -->
-      <a-sphere
-        id="ball"
-        class="clickable"
-        src="#metal"
-        position="0 0.25 1.3"
-        radius="0.25"
-        dynamic-body>
-      </a-sphere>
-
-
-      <!-- Hit数の背景 -->
-      <a-plane
-        position="0 1.8 -0.9"
-        width="1.4"
-        height="0.45"
-        color="black"
-        opacity="0.6">
-      </a-plane>
-
-
-      <!-- Hit数 -->
-      <a-text
-        id="countText"
-        value="0 Hit"
-        position="0 1.79 -0.88"
-        color="white"
-        align="center"
-        width="3">
-      </a-text>
-
-
-      <!-- 的：下段 -->
-      <a-box
-        src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="-0.55 0.25 -0.7"
-        dynamic-body
-        class="target">
-      </a-box>
 
       <a-box
         src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="0 0.25 -0.7"
-        dynamic-body
-        class="target">
+        width="1"
+        height="1"
+        depth="1"
+        position="0 0.5 0"
       </a-box>
 
-      <a-box
-        src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="0.55 0.25 -0.7"
-        dynamic-body
-        class="target">
-      </a-box>
-
-
-      <!-- 的：中段 -->
-      <a-box
-        src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="-0.28 0.75 -0.7"
-        dynamic-body
-        class="target">
-      </a-box>
-
-      <a-box
-        src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="0.28 0.75 -0.7"
-        dynamic-body
-        class="target">
-      </a-box>
-
-
-      <!-- 的：上段 -->
-      <a-box
-        src="#brick"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        position="0 1.25 -0.7"
-        dynamic-body
-        class="target">
-      </a-box>
 
 
     </a-marker>
@@ -177,81 +80,7 @@
 
 
   </a-scene>
-
-
-  <script>
-
-    const ball = document.getElementById("ball");
-    const countText = document.getElementById("countText");
-
-    let count = 0;
-
-
-    // =========================
-    // ボールをタップして飛ばす
-    // =========================
-
-    function shootBall() {
-
-      // bodyがまだ準備されていない場合
-      if (!ball.body) {
-        return;
-      }
-
-      // Hiroマーカー上で奥方向へ飛ばす
-      const force = new CANNON.Vec3(
-        0,     // X
-        0.4,   // Y 少し上へ
-        -2     // Z 奥へ
-      );
-
-      ball.body.applyImpulse(
-        force,
-        ball.body.position
-      );
-    }
-
-
-    ball.addEventListener("click", shootBall);
-
-
-
-    // =========================
-    // 的に当たったとき
-    // =========================
-
-    function hit(event) {
-
-      const enemy = event.detail.body.el;
-
-      // targetクラスがついているか確認
-      if (enemy.classList.contains("target")) {
-
-        // 同じ的を何度も数えない
-        if (enemy.dataset.hit === "true") {
-          return;
-        }
-
-        enemy.dataset.hit = "true";
-
-        // 当たった的を半透明にする
-        enemy.setAttribute("opacity", "0.4");
-
-        // カウント
-        count++;
-
-        countText.setAttribute(
-          "value",
-          count + " Hit"
-        );
-      }
-    }
-
-
-    ball.addEventListener("collide", hit);
-
-  </script>
-
+  
 </body>
 
 </html>

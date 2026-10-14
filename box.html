@@ -10,19 +10,15 @@
 </head>
 
 <body>
-    <a-scene
-        embedded
-        arjs="sourceType: webcam"
-    >
+    <a-scene embedded arjs="sourceType: webcam">
 
-    <a-marker preset="hiro" smooth="true">
-        <a-box position="0 0 0" color="skyblue">
-        </a-box>
-    </a-marker>
+        <a-marker preset="hiro">
+            <a-box position="0 0 0" color="skyblue"></a-box>
+        </a-marker>
 
-    <a-entity camera></a-entity>
-
+        <a-entity camera></a-entity>
     </a-scene>
+
 </body>
 
 </html>

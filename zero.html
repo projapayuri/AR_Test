@@ -18,41 +18,17 @@
   embedded
   arjs="sourceType: webcam">
 
-    <a-marker preset="hiro" smooth="true">
+   <a-marker preset="hiro">
+  <a-cylinder position="0 0.05 0" radius="0.6"
+              height="0.1" color="#444"></a-cylinder>
 
-            <a-entity position="0 -1 0.5" scale="0.5 0.5 0.5" rotation="-90 0 0">
-                <a-cylinder
-                    position="0 3 -5"
-                    radius="0.2"
-                    height="0.7"
-                    color="red"></a-cylinder>
-                <a-sphere
-                    position="0 2.4 -5"
-                    radius="0.7"
-                ></a-sphere>
-                <a-sphere
-                    position="0.2 2.45 -4.3"
-                    color="black"
-                    radius="0.06"
-                    ></a-sphere>
-                <a-box
-                    position="0 2.1 -4.4"
-                    color="black"
-                    width="0.4"
-                    height="0.1"
-                    depth="0.1"
-                ></a-box>
-                <a-sphere
-                    position="-0.2 2.45 -4.3"
-                    color="black"
-                    radius="0.06"
-                    ></a-sphere>
-                <a-sphere
-                    position="0 1 -5"
-                ></a-sphere>
-            </a-entity>
+  <a-gltf-model src="assets/models/robot.glb"
+    position="0 0.18 0" scale="0.5 0.5 0.5"
+    animation="property: rotation; to: 0 360 0;
+               dur: 8000; loop: true; easing: linear">
+  </a-gltf-model>
+</a-marker>
 
-    </a-marker>
 
     <!-- AR用カメラ -->
     <a-entity camera></a-entity>
